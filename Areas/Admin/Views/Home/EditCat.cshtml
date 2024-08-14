@@ -13,7 +13,7 @@
 
         <div class="card mb-4" >
             <div class="card-header d-flex align-items-center justify-content-between">
-                <h5 class="mb-0">دسته بندی جدید</h5>
+                <h5 class="mb-0">تغییر دسته بندی شماره @ViewBag.Cat.CatCode</h5>
                 <small class="text-muted float-end primary-font">دسته بندی</small>
             </div>
             <div class="card-body">
@@ -46,9 +46,8 @@
                                     @foreach (var item in ViewBag.Cats)
 
                                     {
-                                        @if(item.ParentId == 0){
+
                                         <option value="@item.Id">@item.CatName</option>
-                                        }
                                     }
                                 }
                             </select>

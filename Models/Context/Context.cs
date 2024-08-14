@@ -17,6 +17,7 @@ public class Context : DbContext
     public DbSet<Reply> Reply_tbl { get; set; }
     public DbSet<AttechedReply> AttechedReplies_tbl { get; set; }
     public DbSet<Category> Categories_tbl { get; set; }
+    public DbSet<UserCats> UserCats_tbl { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

@@ -100,19 +100,12 @@ namespace test.Migrations
                     NatinalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PerconalCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Profile = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: false),
                     isActive = table.Column<bool>(type: "bit", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users_tbl", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_tbl_Categories_tbl_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories_tbl",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -164,6 +157,33 @@ namespace test.Migrations
                         column: x => x.SenderUserId,
                         principalTable: "Users_tbl",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserCats_tbl",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CatId = table.Column<int>(type: "int", nullable: false),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserCats_tbl", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserCats_tbl_Categories_tbl_CatId",
+                        column: x => x.CatId,
+                        principalTable: "Categories_tbl",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserCats_tbl_Users_tbl_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users_tbl",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -395,6 +415,16 @@ namespace test.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserCats_tbl_CatId",
+                table: "UserCats_tbl",
+                column: "CatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserCats_tbl_UserId",
+                table: "UserCats_tbl",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_userLogs_tbl_UserId",
                 table: "userLogs_tbl",
                 column: "UserId");
@@ -408,11 +438,6 @@ namespace test.Migrations
                 name: "IX_UserRoles_tbl_UserId",
                 table: "UserRoles_tbl",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_tbl_CategoryId",
-                table: "Users_tbl",
-                column: "CategoryId");
         }
 
         /// <inheritdoc />
@@ -440,6 +465,9 @@ namespace test.Migrations
                 name: "smsTokens");
 
             migrationBuilder.DropTable(
+                name: "UserCats_tbl");
+
+            migrationBuilder.DropTable(
                 name: "userLogs_tbl");
 
             migrationBuilder.DropTable(
@@ -452,6 +480,9 @@ namespace test.Migrations
                 name: "Permission_tbl");
 
             migrationBuilder.DropTable(
+                name: "Categories_tbl");
+
+            migrationBuilder.DropTable(
                 name: "Role_tbl");
 
             migrationBuilder.DropTable(
@@ -459,9 +490,6 @@ namespace test.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users_tbl");
-
-            migrationBuilder.DropTable(
-                name: "Categories_tbl");
         }
     }
 }

@@ -75,16 +75,6 @@ public class AuthController : Controller
                 });
             db.SaveChanges();
 
-            db.Categories_tbl.Add(new Category
-            {
-                CatCode = 0,
-                CatName = "-",
-                CreateDateTime = DateTime.UtcNow,
-                ParentId = 0,
-                Status = true,
-            });
-            db.SaveChanges();
-
             db.Users_tbl.Add(new Users
             {
                 Username = "admin",
@@ -98,7 +88,6 @@ public class AuthController : Controller
                 Profile = "admin",
                 CreateDateTime = DateTime.UtcNow,
                 Token = "null",
-                CategoryId = 1
             });
             db.SaveChanges();
 

@@ -6,5 +6,5 @@
     public int CatCode { get; set; }
     public bool Status { get; set; }
 
-    public ICollection<Users> Subs { get; set; }
+    public ICollection<UserCats> Subs { get; set; }
 }

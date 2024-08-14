@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Common;
 using test.Models;
 namespace test.Areas.Admin.Controllers;
 //add Area Admin
@@ -28,53 +29,56 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult AddCat(int? id)
+    public IActionResult Category()
     {
-     
-        Category catMe = new Category();
-        if(id.HasValue)
-        {
-           //edit
-              var cat = dbs.Categories_tbl.Find(id);
-                catMe.Id = cat.Id;
-                catMe.CatName = cat.CatName;
-                catMe.ParentId = cat.ParentId;
-                catMe.CatCode = cat.CatCode;
-                ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x=>x.Id).Where(x=>x.Id != id).ToList();
+        ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x => x.Id).ToList();
+        return View("ViewCat");
+    }
 
-            
-        }
-        else{
-           ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x=>x.Id).ToList();
-        }
-       
-        return View("AddCat",catMe);
+    public IActionResult AddCat()
+    {
+        ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x => x.Id).ToList();
+        return View("AddCat");
+    }
+    
+    public IActionResult EditCat(int id)
+    {
+
+        Category catMe = new Category();
+        
+            //edit
+            var cat = dbs.Categories_tbl.Find(id);
+            catMe.Id = cat.Id;
+            catMe.CatName = cat.CatName;
+            catMe.ParentId = cat.ParentId;
+            catMe.CatCode = cat.CatCode;
+            ViewBag.Cat = cat;
+        return View("EditCat", cat);
     }
 
 
     [HttpPost]
-    public IActionResult AddCat(int? ParentId , string CatName, int? id , int CatCode)
-    {   
-        
-        if(id.HasValue)
+    public IActionResult AddCat(int? ParentId, string CatName, int? id, int CatCode)
+    {
+
+        if (id.HasValue)
         {
             var cat = dbs.Categories_tbl.Find(id);
             cat.CatName = CatName;
             cat.ParentId = !ParentId.HasValue ? 0 : ParentId.Value;
             cat.CatCode = CatCode;
             dbs.SaveChanges();
-            ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x=>x.Id).ToList();
-            return View("AddCat");
+            ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x => x.Id).ToList();
+            return RedirectToAction("Category");
         }
         dbs.Categories_tbl.Add(new Category
         {
-            ParentId = !ParentId.HasValue ? 0 : ParentId.Value ,
+            ParentId = !ParentId.HasValue ? 0 : ParentId.Value,
             CatName = CatName,
             CatCode = (int)CatCode
         });
         dbs.SaveChanges();
-        ViewBag.Cats = dbs.Categories_tbl.OrderByDescending(x=>x.Id).ToList();
-        return View("AddCat");
+        return RedirectToAction("Category");
     }
 
     [HttpGet]
@@ -83,22 +87,22 @@ public class HomeController : Controller
         var cat = dbs.Categories_tbl.Find(id);
         dbs.Categories_tbl.Remove(cat);
         dbs.SaveChanges();
-        return RedirectToAction("AddCat");
+        return RedirectToAction("Category");
     }
 
     public IActionResult ReportSeen()
     {
-       ViewBag.Categories = dbs.Categories_tbl.Where(x=> x.ParentId == 0).OrderByDescending(x=>x.Id).ToList();
+        ViewBag.Categories = dbs.Categories_tbl.Where(x => x.ParentId == 0).OrderByDescending(x => x.Id).ToList();
 
         return View();
     }
     public IActionResult SubReportSeen(int Id)
     {
-       ViewBag.Categories = dbs.Categories_tbl.Where(x=> x.ParentId == Id).OrderByDescending(x=>x.Id).ToList();
+        ViewBag.Categories = dbs.Categories_tbl.Where(x => x.ParentId == Id).OrderByDescending(x => x.Id).ToList();
 
         return View();
     }
-    
+
     [HttpGet]
     public IActionResult Register()
     {
@@ -153,7 +157,8 @@ public class HomeController : Controller
             }
 
             var NewUser =
-                new Users {
+                new Users
+                {
                     Username = user.Username.ToLower(),
                     Password =
                         BCrypt
@@ -171,10 +176,9 @@ public class HomeController : Controller
                     Profile = PathSave,
                     CreateDateTime = DateTime.UtcNow,
                     Token = "null",
-                    CategoryId = 1 // تغییر داده شود به پیشفرض
-                    ,isActive = true
+                    isActive = true
                 };
-            dbs.Users_tbl.Add (NewUser);
+            dbs.Users_tbl.Add(NewUser);
             dbs.SaveChanges();
 
             var RoleCilentId =
@@ -186,8 +190,9 @@ public class HomeController : Controller
 
             dbs
                 .UserRoles_tbl
-                .Add(new UserRole {
-                    UserId = (int) NewUser.Id,
+                .Add(new UserRole
+                {
+                    UserId = (int)NewUser.Id,
                     RoleId = RoleCilentId
                 });
             dbs.SaveChanges();
@@ -195,19 +200,22 @@ public class HomeController : Controller
             return RedirectToAction("GetUsers");
         }
     }
-    public IActionResult GetUsers(){
-        ViewBag.Users = dbs.Users_tbl.Where(x=> x.Username != "admin").OrderByDescending(x=>x.Id).ToList();
+    public IActionResult GetUsers()
+    {
+        ViewBag.Users = dbs.Users_tbl.Where(x => x.Username != "admin").OrderByDescending(x => x.Id).ToList();
         return View("GetUsers");
     }
 
-    public IActionResult UserSetting(int Id){
+    public IActionResult UserSetting(int Id)
+    {
         Users Check = dbs.Users_tbl.Find(Id);
         ViewBag.User = Check;
         return View("UserSetting");
     }
 
     [HttpPost]
-    public async Task<IActionResult> UserSettingAsync(string Addres , string FirstName , string LastName , string Phone , string PerconalCode , string NatinalCode , IFormFile Profile , int Id){
+    public async Task<IActionResult> UserSettingAsync(string Addres, string FirstName, string LastName, string Phone, string PerconalCode, string NatinalCode, IFormFile Profile, int Id)
+    {
         var BaseUser = dbs.Users_tbl.Find(Id);
         BaseUser.Addres = Addres;
         BaseUser.FirstName = FirstName;
@@ -215,7 +223,7 @@ public class HomeController : Controller
         BaseUser.Phone = Phone;
         BaseUser.PerconalCode = PerconalCode;
         BaseUser.NatinalCode = NatinalCode;
-        var PathSave = BaseUser.Profile; 
+        var PathSave = BaseUser.Profile;
         if (Profile != null)
         {
             string FileExtension = Path.GetExtension(Profile.FileName);
@@ -232,7 +240,7 @@ public class HomeController : Controller
         dbs.SaveChanges();
 
 
-       //update Claim Profile
+        //update Claim Profile
         var Identity = new ClaimsIdentity(new[]
         {
             new Claim(ClaimTypes.Name,BaseUser.FirstName+" "+BaseUser.LastName),
@@ -256,6 +264,12 @@ public class HomeController : Controller
         return RedirectToAction("GetUsers");
     }
 
+    public IActionResult UserStatus(int id){
+        var check = dbs.Users_tbl.Find(id);
+        check.isActive = !check.isActive;
+        dbs.SaveChanges();
+        return RedirectToAction("GetUsers");
+    }
 
     [HttpGet]
     public IActionResult ProfileUser()
@@ -277,29 +291,45 @@ public class HomeController : Controller
         return View();
     }
 
-    public IActionResult GetCategory(){
-        ViewBag.Users = dbs.Users_tbl.Where(x=> x.Username != "admin").Include(x=>x.Category).OrderByDescending(x=>x.Id).ToList();
+    public IActionResult GetCategory()
+    {
+        ViewBag.Users = dbs.Users_tbl.Where(x => x.Username != "admin").Include(x => x.Categories).ThenInclude(x=>x.Cat).OrderByDescending(x => x.Id).ToList();
         return View();
     }
+    public IActionResult DelCategories(int id)
+    {
+        dbs.UserCats_tbl.Remove(dbs.UserCats_tbl.Find(id));
+        dbs.SaveChanges();
+        return RedirectToAction("GetCategory");
+    }
     [HttpGet]
-    public IActionResult ChildCategories(int id){
-        ViewBag.Categories = dbs.Categories_tbl.Where(x=> x.ParentId == 0).OrderByDescending(x=>x.Id).ToList();
+    public IActionResult ChildCategories(int id)
+    {
+        ViewBag.Categories = dbs.Categories_tbl.Where(x => x.ParentId == 0).OrderByDescending(x => x.Id).ToList();
         ViewBag.Id = id;
         return View("Categories");
     }
     [HttpGet]
-    public IActionResult Categories(int id , int parentId){
-        ViewBag.Categories = dbs.Categories_tbl.Where(x=> x.ParentId == parentId).OrderByDescending(x=>x.Id).ToList();
+    public IActionResult Categories(int id, int parentId)
+    {
+        ViewBag.Categories = dbs.Categories_tbl.Where(x => x.ParentId == parentId).OrderByDescending(x => x.Id).ToList();
         ViewBag.Id = id;
         ViewBag.parentId = parentId;
         return View();
     }
     [HttpGet]
-    public IActionResult AddCategories(int id , int catId ){
-        var check = dbs.Users_tbl.Find(id);
-        check.CategoryId=catId;
-        dbs.Users_tbl.Update(check);
-        dbs.SaveChanges();
+    public IActionResult AddCategories(int id, int catId)
+    {
+        if (!dbs.UserCats_tbl.Any(x => x.CatId == catId && x.UserId == id))
+        {
+            dbs.UserCats_tbl.Add(new UserCats
+            {
+                CatId = catId,
+                UserId = id,
+                CreateDateTime = DateTime.UtcNow
+            });
+            dbs.SaveChanges();
+        }
         return RedirectToAction("GetCategory");
     }
 }

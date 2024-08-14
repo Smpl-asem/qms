@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace test.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240812100154_first")]
+    [Migration("20240814150530_first")]
     partial class first
     {
         /// <inheritdoc />
@@ -299,6 +299,32 @@ namespace test.Migrations
                     b.ToTable("RolePermissions_tbl");
                 });
 
+            modelBuilder.Entity("UserCats", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
+
+                    b.Property<int>("CatId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreateDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CatId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserCats_tbl");
+                });
+
             modelBuilder.Entity("UserLog", b =>
                 {
                     b.Property<int?>("Id")
@@ -360,9 +386,6 @@ namespace test.Migrations
                     b.Property<string>("Addres")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("CreateDateTime")
                         .HasColumnType("datetime2");
 
@@ -397,8 +420,6 @@ namespace test.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.ToTable("Users_tbl");
                 });
@@ -544,6 +565,25 @@ namespace test.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("UserCats", b =>
+                {
+                    b.HasOne("Category", "Cat")
+                        .WithMany("Subs")
+                        .HasForeignKey("CatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Users", "User")
+                        .WithMany("Categories")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cat");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("UserLog", b =>
                 {
                     b.HasOne("Users", "User")
@@ -572,17 +612,6 @@ namespace test.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Users", b =>
-                {
-                    b.HasOne("Category", "Category")
-                        .WithMany("Subs")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Category", b =>
@@ -618,6 +647,8 @@ namespace test.Migrations
 
             modelBuilder.Entity("Users", b =>
                 {
+                    b.Navigation("Categories");
+
                     b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618

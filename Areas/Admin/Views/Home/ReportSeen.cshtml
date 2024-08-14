@@ -1,9 +1,5 @@
 @* card for show parnd cat  *@
 <style>
- .card:hover {
-      background-color: #ceddfa  !important;
-     
-    }
     .folder-card {  
             background-color: #ffffff;  
             border: 1px solid #ccc;  
@@ -36,7 +32,12 @@
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <div class="col-xxl row">
-    @if(@ViewBag.Categories != null){
+    @if(@ViewBag.Categories.Count != 0){
+        <style>
+            .card:hover {
+                background-color: #ceddfa  !important;
+            }
+        </style>
         foreach(var item in ViewBag.Categories){
 
                     <a class="folder-card card col-xl-3 col-lg-3 col-md-3 col-sm-6 col-12 m-2" href="/Admin/home/SubReportSeen/@item.Id">  
@@ -62,6 +63,20 @@
                     </div>
                 </div> *@
         }
+    }
+    else{
+        <div class="card mb-4">
+        <div class="container-xxl container-p-y">
+                <div class="misc-wrapper">
+                    <h1 class="mb-2 mx-2 secondary-font">لیست گروه بندی ها خالی میباشد</h1>
+                    <p class="mb-4 mx-2">با مراجعه به "گروه بندی ها" میتوانید گروه بندی مورد نظر رو اضافه کنید</p>
+                    <a href="/Admin/Home/AddCat" class="btn btn-primary">گروه بندی ها</a>
+                    <div class="mt-4">
+                    <img src="../../assets/img/illustrations/boy-working-light.png" alt="girl-doing-yoga-light" width="500" class="img-fluid" data-app-light-img="illustrations/boy-working-light.png" data-app-dark-img="illustrations/boy-working-dark.png">
+                </div>
+            </div>
+        </div>
+        </div>
     }
 
     
